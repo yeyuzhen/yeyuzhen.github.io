@@ -1,3 +1,9 @@
+---
+title: A guide to own a long-term chatgpt account in chinese mainland
+date: 2023-06-11 23:07:00
+tags:
+---
+
 # Buy an overseas mobile phone physical card
 Tailand mobile phone card, AIS green card, message card, 10 THB delay validity a month, no voice and network traffic:
 https://xunihao.net/product/thailand-ais
