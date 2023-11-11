@@ -4,7 +4,7 @@ date: 2023-11-11 22:18:16
 tags:
 ---
 
-> 注：这是2021年1月写的旧博文，转载到此。
+> 注：这是2020年1月写的旧博文，转载到此。
 
 # Anki是什么？
 本文假定你是个Anki用户，并不会对Anki基础知识进行介绍。对Anki不熟悉的读者可以阅读Anki英文官网（[Anki - powerful, intelligent flashcards](https://apps.ankiweb.net/)），或Anki中国（[Anki--近乎完美的记忆神器](https://www.ankichina.net/anki20.html)）的介绍内容。
@@ -67,4 +67,4 @@ Anki 虽好，可不要瞎折腾。花太多时间在牌组的结构上就属于
 [1] Anki 2.0 用户手册，[https://www.ankichina.net/Index/ankishouce](https://www.ankichina.net/Index/ankishouce)
 [2] 有效学习——组织知识的20个原则，[https://www.jianshu.com/p/163462164a5b](https://www.jianshu.com/p/163462164a5b)
 
-版权声明：自由转载-非商用-非衍生-保持署名（[创意共享3.0许可证](https://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh)）
+版权声明：自由转载-非商用-非衍生-保持署名（[创意共享4.0许可证](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh-hans)）
