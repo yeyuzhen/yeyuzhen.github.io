@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha256-Z1K5uhUaJXA7Ll0XrZ/0JhX4lAtZFpT6jkKrEDT0drU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"yeyuzhen.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.14.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="注：这是2018年2月写的旧博文，转载到此。  Redis使用了一个称为“A simple event-driven programming library”的自制异步事件库(以下简称“AE”)。整个事件库的代码量少于1k行，是个优秀的C异步事件库学习材料。 源码结构 版本 Redis 4.0.8  redis的src目录下，ae开头的几个文件就是AE事件库的源码。    文件 用途    ae">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis AE异步事件库实例分析">
+<meta property="og:url" content="https://yeyuzhen.github.io/2023/11/12/redis_ae_client/index.html">
+<meta property="og:site_name" content="Eason&#39;s Blog">
+<meta property="og:description" content="注：这是2018年2月写的旧博文，转载到此。  Redis使用了一个称为“A simple event-driven programming library”的自制异步事件库(以下简称“AE”)。整个事件库的代码量少于1k行，是个优秀的C异步事件库学习材料。 源码结构 版本 Redis 4.0.8  redis的src目录下，ae开头的几个文件就是AE事件库的源码。    文件 用途    ae">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-11-12T04:40:21.000Z">
+<meta property="article:modified_time" content="2023-11-12T04:44:01.626Z">
+<meta property="article:author" content="Eason Ye">
+<meta property="article:tag" content="technology">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://yeyuzhen.github.io/2023/11/12/redis_ae_client/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://yeyuzhen.github.io/2023/11/12/redis_ae_client/","path":"2023/11/12/redis_ae_client/","title":"Redis AE异步事件库实例分析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Redis AE异步事件库实例分析 | Eason's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Eason's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E7%BB%93%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">源码结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AE%E4%BA%8B%E4%BB%B6%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">AE事件模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E4%BB%B6-IO-%E4%BA%8B%E4%BB%B6"><span class="nav-number">2.0.0.1.</span> <span class="nav-text">文件(IO)事件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9A%E6%97%B6%E5%99%A8%E4%BA%8B%E4%BB%B6"><span class="nav-number">2.0.0.2.</span> <span class="nav-text">定时器事件</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AE%E5%BC%82%E6%AD%A5%E4%BA%8B%E4%BB%B6%E5%BA%93%E7%9A%84%E5%85%B8%E5%9E%8B%E7%94%A8%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">AE异步事件库的典型用法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AE%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF"><span class="nav-number">4.</span> <span class="nav-text">AE事件循环</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Eason Ye</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yeyuzhen.github.io/2023/11/12/redis_ae_client/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Eason Ye">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Eason's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Redis AE异步事件库实例分析 | Eason's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis AE异步事件库实例分析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-11-12 12:40:21 / 修改时间：12:44:01" itemprop="dateCreated datePublished" datetime="2023-11-12T12:40:21+08:00">2023-11-12</time>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2023/11/12/redis_ae_client/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2023/11/12/redis_ae_client/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <blockquote>
+<p>注：这是2018年2月写的旧博文，转载到此。</p>
+</blockquote>
+<p>Redis使用了一个称为“A simple event-driven programming library”的自制异步事件库(以下简称“AE”)。整个事件库的代码量少于1k行，是个优秀的C异步事件库学习材料。</p>
+<h1 id="源码结构"><a href="#源码结构" class="headerlink" title="源码结构"></a>源码结构</h1><blockquote>
+<p>版本 Redis 4.0.8</p>
+</blockquote>
+<p>redis的src目录下，ae开头的几个文件就是AE事件库的源码。</p>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ae.h</td>
+<td>AE事件库接口定义</td>
+</tr>
+<tr>
+<td>ae.c</td>
+<td>AE事件库实现</td>
+</tr>
+<tr>
+<td>ae_epoll.c</td>
+<td>epoll绑定</td>
+</tr>
+<tr>
+<td>ae_evport.c</td>
+<td>evport绑定</td>
+</tr>
+<tr>
+<td>ae_kqueue.c</td>
+<td>kqueue绑定</td>
+</tr>
+<tr>
+<td>ae_select.c</td>
+<td>select绑定</td>
+</tr>
+</tbody></table>
+<p>文件数量有点多，我们把IO多路复用的绑定都“精简”掉。在“ae.c”的开头有这么一段代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">/* Include the best multiplexing layer supported by this system.</span><br><span class="line"> * The following should be ordered by performances, descending. */</span><br><span class="line">#ifdef HAVE_EVPORT</span><br><span class="line">#include &quot;ae_evport.c&quot;</span><br><span class="line">#else</span><br><span class="line">    #ifdef HAVE_EPOLL</span><br><span class="line">    #include &quot;ae_epoll.c&quot;</span><br><span class="line">    #else</span><br><span class="line">        #ifdef HAVE_KQUEUE</span><br><span class="line">        #include &quot;ae_kqueue.c&quot;</span><br><span class="line">        #else</span><br><span class="line">        #include &quot;ae_select.c&quot;</span><br><span class="line">        #endif</span><br><span class="line">    #endif</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+<p>Redis根据所处系统的不同，包含不同的IO多路复用实现代码。每种IO多路复用都实现了以下的接口：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">struct aeApiState;</span><br><span class="line">static int aeApiCreate(aeEventLoop *eventLoop);</span><br><span class="line">static int aeApiResize(aeEventLoop *eventLoop, int setsize);</span><br><span class="line">static void aeApiFree(aeEventLoop *eventLoop);</span><br><span class="line">static int aeApiAddEvent(aeEventLoop *eventLoop, int fd, int mask);</span><br><span class="line">static void aeApiDelEvent(aeEventLoop *eventLoop, int fd, int mask);</span><br><span class="line">static int aeApiPoll(aeEventLoop *eventLoop, struct timeval *tvp);</span><br><span class="line">static char *aeApiName(void);</span><br></pre></td></tr></table></figure>
+<p>任意的IO多路复用技术，只要封装出以上的接口就可以被AE事件库作为底层实现使用。我们“精简”掉4个IO多路复用绑定代码之后，就剩下“ae.h、ae.c”这两个文件了。</p>
+<h1 id="AE事件模型"><a href="#AE事件模型" class="headerlink" title="AE事件模型"></a>AE事件模型</h1><p>AE异步事件库支持以下的事件类型：</p>
+<ul>
+<li>文件事件</li>
+<li>定时器事件</li>
+</ul>
+<p>Redis本身是一个KV数据库，主要就是接收客户端的查询请求并返回结果，以及对KV数据的有效性维护。所以文件事件(IO事件)和定时器事件就足以支撑服务端的全部功能。</p>
+<h4 id="文件-IO-事件"><a href="#文件-IO-事件" class="headerlink" title="文件(IO)事件"></a>文件(IO)事件</h4><p>与文件事件相关的定义和接口有：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">#define AE_NONE 0</span><br><span class="line">#define AE_READABLE 1</span><br><span class="line">#define AE_WRITABLE 2</span><br><span class="line"></span><br><span class="line">typedef void aeFileProc(struct aeEventLoop *eventLoop, int fd, void *clientData, int mask);</span><br><span class="line"></span><br><span class="line">/* File event structure */</span><br><span class="line">typedef struct aeFileEvent &#123;</span><br><span class="line">    int mask; /* one of AE_(READABLE|WRITABLE) */</span><br><span class="line">    aeFileProc *rfileProc;</span><br><span class="line">    aeFileProc *wfileProc;</span><br><span class="line">    void *clientData;</span><br><span class="line">&#125; aeFileEvent;</span><br><span class="line"></span><br><span class="line">int aeCreateFileEvent(aeEventLoop *eventLoop, int fd, int mask, aeFileProc *proc, void *clientData);</span><br><span class="line">void aeDeleteFileEvent(aeEventLoop *eventLoop, int fd, int mask);</span><br></pre></td></tr></table></figure>
+
+<h4 id="定时器事件"><a href="#定时器事件" class="headerlink" title="定时器事件"></a>定时器事件</h4><p>与定时器事件相关的定义和接口有：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">typedef int aeTimeProc(struct aeEventLoop *eventLoop, long long id, void *clientData);</span><br><span class="line">typedef void aeEventFinalizerProc(struct aeEventLoop *eventLoop, void *clientData);</span><br><span class="line"></span><br><span class="line">/* Time event structure */</span><br><span class="line">typedef struct aeTimeEvent &#123;</span><br><span class="line">    long long id; /* time event identifier. */</span><br><span class="line">    long when_sec; /* seconds */</span><br><span class="line">    long when_ms; /* milliseconds */</span><br><span class="line">    aeTimeProc *timeProc;</span><br><span class="line">    aeEventFinalizerProc *finalizerProc;</span><br><span class="line">    void *clientData;</span><br><span class="line">    struct aeTimeEvent *next;</span><br><span class="line">&#125; aeTimeEvent;</span><br><span class="line"></span><br><span class="line">long long aeCreateTimeEvent(aeEventLoop *eventLoop, long long milliseconds,</span><br><span class="line">        aeTimeProc *proc, void *clientData,</span><br><span class="line">        aeEventFinalizerProc *finalizerProc);</span><br><span class="line">int aeDeleteTimeEvent(aeEventLoop *eventLoop, long long id);</span><br></pre></td></tr></table></figure>
+<p>每种事件类型都定义了回调函数、事件结构体、事件添加&#x2F;删除接口，以支持该类型事件的操作。</p>
+<h1 id="AE异步事件库的典型用法"><a href="#AE异步事件库的典型用法" class="headerlink" title="AE异步事件库的典型用法"></a>AE异步事件库的典型用法</h1><p>下面的例子使用AE事件库进行网络读写和定时器操作：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">/* file: example-libae.c */</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &lt;time.h&gt;</span><br><span class="line">#include &lt;ae.h&gt;</span><br><span class="line"></span><br><span class="line">static const int MAX_SETSIZE = 64;</span><br><span class="line">static const int MAX_BUFSIZE = 128;</span><br><span class="line"></span><br><span class="line">static void</span><br><span class="line">file_cb(struct aeEventLoop *eventLoop, int fd, void *clientData, int mask)</span><br><span class="line">&#123;</span><br><span class="line">    char buf[MAX_BUFSIZE] = &#123;0&#125;;</span><br><span class="line">    int rc;</span><br><span class="line"></span><br><span class="line">    rc = read(fd, buf, MAX_BUFSIZE);</span><br><span class="line">    if (rc &lt; 0)</span><br><span class="line">    &#123;</span><br><span class="line">        aeStop(eventLoop);</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">    &#123;</span><br><span class="line">        buf[rc - 1] = &#x27;\0&#x27;;  /* 最后一个字符是回车 */</span><br><span class="line">    &#125;</span><br><span class="line">    printf(&quot;file_cb, read %s, fd %d, mask %d, clientData %s\n&quot;, buf, fd, mask, (char *)clientData);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">static int</span><br><span class="line">timer_cb(struct aeEventLoop *eventLoop, long long id, void *clientData)</span><br><span class="line">&#123;</span><br><span class="line">    printf(&quot;timer_cb, timestamp %ld, id %lld, clientData %s\n&quot;, time(NULL), id, (char *)clientData);</span><br><span class="line">    return (5 * 1000);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">static void</span><br><span class="line">timer_fin_cb(struct aeEventLoop *eventLoop, void *clientData)</span><br><span class="line">&#123;</span><br><span class="line">    printf(&quot;timer_fin_cb, timestamp %ld, clientData %s\n&quot;, time(NULL), (char *)clientData);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int argc, char *argv[])</span><br><span class="line">&#123;</span><br><span class="line">    aeEventLoop *ae;</span><br><span class="line">    long long id;</span><br><span class="line">    int rc;</span><br><span class="line"></span><br><span class="line">    ae = aeCreateEventLoop(MAX_SETSIZE);</span><br><span class="line">    if (!ae)</span><br><span class="line">    &#123;</span><br><span class="line">        printf(&quot;create event loop error\n&quot;);</span><br><span class="line">        goto err;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /* 添加文件IO事件 */</span><br><span class="line">    rc = aeCreateFileEvent(ae, STDIN_FILENO, AE_READABLE, file_cb, (void *)&quot;test ae file event&quot;);</span><br><span class="line"></span><br><span class="line">    /* 添加定时器事件 */</span><br><span class="line">    id = aeCreateTimeEvent(ae, 5 * 1000, timer_cb, (void *)&quot;test ae time event&quot;, timer_fin_cb);</span><br><span class="line">    if (id &lt; 0)</span><br><span class="line">    &#123;</span><br><span class="line">        printf(&quot;create time event error\n&quot;);</span><br><span class="line">        aeDeleteEventLoop(ae);</span><br><span class="line">        goto err;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    aeMain(ae);</span><br><span class="line"></span><br><span class="line">    aeDeleteEventLoop(ae);</span><br><span class="line">    return (0);</span><br><span class="line"></span><br><span class="line">err:</span><br><span class="line">    return (-1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以把这个文件放在Redis的deps&#x2F;hiredis&#x2F;examples目录下，修改hiredis目录的Makefile</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">AE_DIR=/path/to/redis/src</span><br><span class="line">example-libae: examples/example-libae.c $(STLIBNAME)</span><br><span class="line">    $(CC) -o examples/$@ $(REAL_CFLAGS) $(REAL_LDFLAGS) -I. -I$(AE_DIR) $&lt; $(AE_DIR)/ae.o $(AE_DIR)/zmalloc.o $(AE_DIR)/../deps/jemalloc/lib/libjemalloc.a -pthread $(STLIBNAME)</span><br></pre></td></tr></table></figure>
+<p>编译执行看一下效果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ make example-libae</span><br><span class="line">$ examples/example-libae</span><br><span class="line">123456</span><br><span class="line">file_cb, read 123456, fd 0, mask 1, clientData test ae file event</span><br><span class="line">timer_cb, timestamp 1519137082, id 0, clientData test ae time event</span><br><span class="line">^C</span><br></pre></td></tr></table></figure>
+<p>可以看到AE异步事件库的使用还是比较简单，没有复杂的概念和接口。</p>
+<h1 id="AE事件循环"><a href="#AE事件循环" class="headerlink" title="AE事件循环"></a>AE事件循环</h1><p>一个异步事件库除了事件模型外，最重要的部分就是事件循环了。来看看AE的事件循环“aeMain”是怎么实现的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">/* file: ae.c */</span><br><span class="line">void aeMain(aeEventLoop *eventLoop) &#123;</span><br><span class="line">    eventLoop-&gt;stop = 0;</span><br><span class="line">    while (!eventLoop-&gt;stop) &#123; /* 运行状态判断 */</span><br><span class="line">        if (eventLoop-&gt;beforesleep != NULL)</span><br><span class="line">            eventLoop-&gt;beforesleep(eventLoop); /* 事件循环前回调执行 */</span><br><span class="line">        aeProcessEvents(eventLoop, AE_ALL_EVENTS|AE_CALL_AFTER_SLEEP);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>看来“aeProcessEvents”函数才是事件循环的主体：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">/* file: ae.c */</span><br><span class="line"></span><br><span class="line">int aeProcessEvents(aeEventLoop *eventLoop, int flags)</span><br><span class="line">&#123;</span><br><span class="line">    int processed = 0, numevents;</span><br><span class="line"></span><br><span class="line">    /* 如果啥事件都不关注，立即返回 */</span><br><span class="line">    if (!(flags &amp; AE_TIME_EVENTS) &amp;&amp; !(flags &amp; AE_FILE_EVENTS)) return 0;</span><br><span class="line"></span><br><span class="line">    if (eventLoop-&gt;maxfd != -1 ||</span><br><span class="line">        ((flags &amp; AE_TIME_EVENTS) &amp;&amp; !(flags &amp; AE_DONT_WAIT))) &#123;</span><br><span class="line">        int j;</span><br><span class="line">        aeTimeEvent *shortest = NULL;</span><br><span class="line">        struct timeval tv, *tvp;</span><br><span class="line"></span><br><span class="line">       /* 略去计算tvp的代码 */</span><br><span class="line">        …… ……</span><br><span class="line"></span><br><span class="line">        /* 调用IO多路复用接口 */</span><br><span class="line">        numevents = aeApiPoll(eventLoop, tvp);</span><br><span class="line"></span><br><span class="line">        /* 略去IO多路复用后回调执行代码 */</span><br><span class="line">        …… ……</span><br><span class="line"></span><br><span class="line">        for (j = 0; j &lt; numevents; j++) &#123; /* 循环处理IO事件 */</span><br><span class="line">            aeFileEvent *fe = &amp;eventLoop-&gt;events[eventLoop-&gt;fired[j].fd];</span><br><span class="line">            int mask = eventLoop-&gt;fired[j].mask;</span><br><span class="line">            int fd = eventLoop-&gt;fired[j].fd;</span><br><span class="line">            int rfired = 0;</span><br><span class="line"></span><br><span class="line">            /* 执行读回调函数 */</span><br><span class="line">            if (fe-&gt;mask &amp; mask &amp; AE_READABLE) &#123;</span><br><span class="line">                rfired = 1;</span><br><span class="line">                fe-&gt;rfileProc(eventLoop,fd,fe-&gt;clientData,mask); </span><br><span class="line">            &#125;</span><br><span class="line">            /* 执行写回调函数 */</span><br><span class="line">            if (fe-&gt;mask &amp; mask &amp; AE_WRITABLE) &#123;</span><br><span class="line">                if (!rfired || fe-&gt;wfileProc != fe-&gt;rfileProc)</span><br><span class="line">                    fe-&gt;wfileProc(eventLoop,fd,fe-&gt;clientData,mask); </span><br><span class="line">            &#125;</span><br><span class="line">            processed++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    /* 执行定时器事件 */</span><br><span class="line">    if (flags &amp; AE_TIME_EVENTS)</span><br><span class="line">        processed += processTimeEvents(eventLoop);</span><br><span class="line"></span><br><span class="line">    return processed; /* return the number of processed file/time events */</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在“aeProcessEvents”函数主体中，对于文件(IO)事件的处理逻辑已经比较清晰，调用IO多路复用接口并循环处理返回的有效文件描述符。定时器事件在“processTimeEvents”函数中处理：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">/* file: ae.c */</span><br><span class="line"></span><br><span class="line">static int processTimeEvents(aeEventLoop *eventLoop) &#123;</span><br><span class="line">    int processed = 0;</span><br><span class="line">    aeTimeEvent *te, *prev;</span><br><span class="line">    long long maxId;</span><br><span class="line">    time_t now = time(NULL);</span><br><span class="line"></span><br><span class="line">    /* 发现系统时间修改过，为防止定时器永远无法执行，将定时器设置为立即执行 */</span><br><span class="line">    if (now &lt; eventLoop-&gt;lastTime) &#123;</span><br><span class="line">        te = eventLoop-&gt;timeEventHead;</span><br><span class="line">        while(te) &#123;</span><br><span class="line">            te-&gt;when_sec = 0;</span><br><span class="line">            te = te-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    eventLoop-&gt;lastTime = now;</span><br><span class="line"></span><br><span class="line">    prev = NULL;</span><br><span class="line">    te = eventLoop-&gt;timeEventHead;</span><br><span class="line">    maxId = eventLoop-&gt;timeEventNextId-1;</span><br><span class="line">    while(te) &#123;</span><br><span class="line">        long now_sec, now_ms;</span><br><span class="line">        long long id;</span><br><span class="line"></span><br><span class="line">        /* 略去删除失效定时器代码 */</span><br><span class="line">        …… ……</span><br><span class="line"> </span><br><span class="line">        /* 略去作者都注释说没什么用的代码囧 */</span><br><span class="line">        …… ……</span><br><span class="line"></span><br><span class="line">        aeGetTime(&amp;now_sec, &amp;now_ms);</span><br><span class="line">        if (now_sec &gt; te-&gt;when_sec ||</span><br><span class="line">            (now_sec == te-&gt;when_sec &amp;&amp; now_ms &gt;= te-&gt;when_ms))</span><br><span class="line">        &#123;</span><br><span class="line">            int retval;</span><br><span class="line"></span><br><span class="line">            id = te-&gt;id;</span><br><span class="line">            /* 执行回调函数 */</span><br><span class="line">            retval = te-&gt;timeProc(eventLoop, id, te-&gt;clientData);</span><br><span class="line">            processed++;</span><br><span class="line">            if (retval != AE_NOMORE) &#123;</span><br><span class="line">                /* 需要继续保留的定时器，根据回调函数的返回值重新计算延迟时间 */</span><br><span class="line">                aeAddMillisecondsToNow(retval,&amp;te-&gt;when_sec,&amp;te-&gt;when_ms);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                /* 无需保留的定时器，打上删除标识 */</span><br><span class="line">                te-&gt;id = AE_DELETED_EVENT_ID;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        prev = te;</span><br><span class="line">        te = te-&gt;next;</span><br><span class="line">    &#125;</span><br><span class="line">    return processed;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>AE库的定时器事件很“简单粗暴”的使用了链表。新事件都往表头添加(详见“aeCreateFileEvent”函数实现)，循环遍历链表执行定时器事件。没有使用复杂的时间堆和时间轮，简单可用，只是查找和执行定时器事件的事件复杂度都是O(n)。作者在注释中也解释说，现在基于链表的定时器事件处理机制已经足够Redis使用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/* Search the first timer to fire.</span><br><span class="line"> * This operation is useful to know how many time the select can be</span><br><span class="line"> * put in sleep without to delay any event.</span><br><span class="line"> * If there are no timers NULL is returned.</span><br><span class="line"> *</span><br><span class="line"> * Note that&#x27;s O(N) since time events are unsorted.</span><br><span class="line"> * Possible optimizations (not needed by Redis so far, but...):</span><br><span class="line"> * 1) Insert the event in order, so that the nearest is just the head.</span><br><span class="line"> *    Much better but still insertion or deletion of timers is O(N).</span><br><span class="line"> * 2) Use a skiplist to have this operation as O(1) and insertion as O(log(N)).</span><br><span class="line"> */</span><br></pre></td></tr></table></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>从前面的分析可以看到，AE异步事件库本身的实现很简洁，却支撑起了业界最流行的KV内存数据库的核心功能。让我想起了业界的一句鸡汤，“要么架构优雅到不怕Bug，要么代码简洁到不会有Bug”。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>[1] <a target="_blank" rel="noopener" href="https://my.oschina.net/u/917596/blog/161077">事件库之Redis自己的事件模型-ae</a>，by C_Z</p>
+<p>版权声明：自由转载-非商用-非衍生-保持署名（<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh-hans">创意共享4.0许可证</a>）</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/technology/" rel="tag"># technology</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/11/12/cython_fly/" rel="prev" title="用Cython加速Python到“起飞”">
+                  <i class="fa fa-chevron-left"></i> 用Cython加速Python到“起飞”
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Eason Ye</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+<script class="next-config" data-name="disqus" type="application/json">{"enable":true,"shortname":"blog-eason","count":true,"i18n":{"disqus":"disqus"}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>
