@@ -22,23 +22,23 @@
     <meta name="description" content="注：这是2018年2月写的旧博文，转载到此。  Redis 协议Redis客户端和服务端之间使用一种名为RESP(REdis Serialization Protocol)的二进制安全文本协议进行通信。RESP设计的十分精巧，下面是一张完备的协议描述图： #举个栗子用SET命令来举例说明RESP协议的格式。 12redis&gt; SET mykey &quot;Hello&quot;&amp;quot">
 <meta property="og:type" content="article">
 <meta property="og:title" content="图解Redis通信协议">
-<meta property="og:url" content="https://yeyuzhen.github.io/2023/11/11/post/index.html">
+<meta property="og:url" content="https://yeyuzhen.github.io/2023/11/11/diagram_redis_protocol/index.html">
 <meta property="og:site_name" content="Eason&#39;s Blog">
 <meta property="og:description" content="注：这是2018年2月写的旧博文，转载到此。  Redis 协议Redis客户端和服务端之间使用一种名为RESP(REdis Serialization Protocol)的二进制安全文本协议进行通信。RESP设计的十分精巧，下面是一张完备的协议描述图： #举个栗子用SET命令来举例说明RESP协议的格式。 12redis&gt; SET mykey &quot;Hello&quot;&amp;quot">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://yeyuzhen.github.io/images/redis_protocol_diagram.png">
 <meta property="article:published_time" content="2023-11-11T15:22:20.000Z">
-<meta property="article:modified_time" content="2023-11-11T15:39:08.394Z">
+<meta property="article:modified_time" content="2023-11-12T04:35:30.419Z">
 <meta property="article:author" content="Eason Ye">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://yeyuzhen.github.io/images/redis_protocol_diagram.png">
 
 
-<link rel="canonical" href="https://yeyuzhen.github.io/2023/11/11/post/">
+<link rel="canonical" href="https://yeyuzhen.github.io/2023/11/11/diagram_redis_protocol/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://yeyuzhen.github.io/2023/11/11/post/","path":"2023/11/11/post/","title":"图解Redis通信协议"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://yeyuzhen.github.io/2023/11/11/diagram_redis_protocol/","path":"2023/11/11/diagram_redis_protocol/","title":"图解Redis通信协议"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>图解Redis通信协议 | Eason's Blog</title>
@@ -119,7 +119,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -147,7 +147,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://yeyuzhen.github.io/2023/11/11/post/">
+    <link itemprop="mainEntityOfPage" href="https://yeyuzhen.github.io/2023/11/11/diagram_redis_protocol/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -175,9 +175,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2023-11-11 23:22:20 / 修改时间：23:39:08" itemprop="dateCreated datePublished" datetime="2023-11-11T23:22:20+08:00">2023-11-11</time>
+      <time title="创建时间：2023-11-11 23:22:20" itemprop="dateCreated datePublished" datetime="2023-11-11T23:22:20+08:00">2023-11-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-11-12 12:35:30" itemprop="dateModified" datetime="2023-11-12T12:35:30+08:00">2023-11-12</time>
     </span>
 
   
@@ -189,8 +195,8 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2023/11/11/post/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2023/11/11/post/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2023/11/11/diagram_redis_protocol/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2023/11/11/diagram_redis_protocol/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -236,6 +242,9 @@
                 </a>
             </div>
             <div class="post-nav-item">
+                <a href="/2023/11/12/cython_fly/" rel="next" title="[object Object]">
+                  [object Object] <i class="fa fa-chevron-right"></i>
+                </a>
             </div>
           </div>
     </footer>

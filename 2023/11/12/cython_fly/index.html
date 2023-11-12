@@ -19,23 +19,29 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"yeyuzhen.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.14.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"disqus","storage":true,"lazyload":false,"nav":null,"activeClass":"disqus"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
 
-    <meta property="og:type" content="website">
-<meta property="og:title" content="Eason&#39;s Blog">
-<meta property="og:url" content="https://yeyuzhen.github.io/index.html">
+    <meta name="description" content="注：这是2020年1月写的旧博文，转载到此。  事先声明，标题没有把“Python”错打成“Cython”，因为要讲的就是名为“Cython”的东西。 Cython是让Python脚本支持C语言扩展的编译器，Cython能够将Python+C混合编码的.pyx脚本转换为C代码，主要用于优化Python脚本性能或Python调用C函数库。由于Python固有的性能差的问题，用C扩展Python成为">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[object Object]">
+<meta property="og:url" content="https://yeyuzhen.github.io/2023/11/12/cython_fly/index.html">
 <meta property="og:site_name" content="Eason&#39;s Blog">
+<meta property="og:description" content="注：这是2020年1月写的旧博文，转载到此。  事先声明，标题没有把“Python”错打成“Cython”，因为要讲的就是名为“Cython”的东西。 Cython是让Python脚本支持C语言扩展的编译器，Cython能够将Python+C混合编码的.pyx脚本转换为C代码，主要用于优化Python脚本性能或Python调用C函数库。由于Python固有的性能差的问题，用C扩展Python成为">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yeyuzhen.github.io/images/python_support_c.png">
+<meta property="article:published_time" content="2023-11-12T04:35:30.419Z">
+<meta property="article:modified_time" content="2023-11-12T04:35:30.419Z">
 <meta property="article:author" content="Eason Ye">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yeyuzhen.github.io/images/python_support_c.png">
 
 
-<link rel="canonical" href="https://yeyuzhen.github.io/">
+<link rel="canonical" href="https://yeyuzhen.github.io/2023/11/12/cython_fly/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://yeyuzhen.github.io/2023/11/12/cython_fly/","path":"2023/11/12/cython_fly/","title":"[object Object]"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Eason's Blog</title>
+<title>[object Object] | Eason's Blog</title>
   
 
 
@@ -65,7 +71,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <h1 class="site-title">Eason's Blog</h1>
+      <p class="site-title">Eason's Blog</p>
       <i class="logo-line"></i>
     </a>
   </div>
@@ -87,7 +93,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -100,6 +106,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Cython%E7%AE%80%E5%8D%95%E5%AE%9E%E4%BE%8B"><span class="nav-number">1.</span> <span class="nav-text">Cython简单实例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Cython%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">2.</span> <span class="nav-text">Cython的注意事项</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-pyx%E4%B8%AD%E7%94%A8cdef%E5%AE%9A%E4%B9%89%E7%9A%84%E7%B1%BB%E5%9E%8B%EF%BC%8C%E9%99%A4%E7%B1%BB%E4%BB%A5%E5%A4%96%E5%AF%B9-py%E9%83%BD%E4%B8%8D%E5%8F%AF%E8%A7%81"><span class="nav-number">2.1.</span> <span class="nav-text">1. .pyx中用cdef定义的类型，除类以外对.py都不可见</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-py%E4%BC%A0%E9%80%92C%E7%BB%93%E6%9E%84%E4%BD%93%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.2.</span> <span class="nav-text">2. .py传递C结构体类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-python%E7%9A%84str%E4%BC%A0%E9%80%92%E7%BB%99C%E5%9B%BA%E5%AE%9A%E9%95%BF%E5%BA%A6%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%A6%81%E7%94%A8strcpy"><span class="nav-number">2.3.</span> <span class="nav-text">3. python的str传递给C固定长度字符串要用strcpy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%94%A8%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0%E4%BD%9C%E4%B8%BA%E5%8F%82%E6%95%B0%E7%9A%84C%E5%87%BD%E6%95%B0%E5%B0%81%E8%A3%85"><span class="nav-number">2.4.</span> <span class="nav-text">4. 用回调函数作为参数的C函数封装</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%89%A9%E5%B1%95%E9%98%85%E8%AF%BB"><span class="nav-number">3.</span> <span class="nav-text">扩展阅读</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -129,16 +136,17 @@
 
     </div>
 
-    <div class="main-inner index posts-expand">
+    <div class="main-inner post posts-expand">
 
-    
+
+  
 
 
 <div class="post-block">
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://yeyuzhen.github.io/2023/11/12/cython_fly/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -152,13 +160,13 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Eason's Blog">
+      <meta itemprop="name" content="[object Object] | Eason's Blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2023/11/12/cython_fly/" class="post-title-link" itemprop="url">[object Object]</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          [object Object]
+        </h1>
 
         <div class="post-meta-container">
           <div class="post-meta">
@@ -195,7 +203,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <blockquote>
+        <blockquote>
 <p>注：这是2020年1月写的旧博文，转载到此。</p>
 </blockquote>
 <p>事先声明，标题没有把“Python”错打成“Cython”，因为要讲的就是名为“Cython”的东西。</p>
@@ -273,7 +281,6 @@
 </ul>
 <p>版权声明：自由转载-非商用-非衍生-保持署名（<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh-hans">创意共享4.0许可证</a>）</p>
 
-      
     </div>
 
     
@@ -281,552 +288,18 @@
     
 
     <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
 
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://yeyuzhen.github.io/2023/11/11/diagram_redis_protocol/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Eason Ye">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Eason's Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Eason's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2023/11/11/diagram_redis_protocol/" class="post-title-link" itemprop="url">图解Redis通信协议</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2023-11-11 23:22:20" itemprop="dateCreated datePublished" datetime="2023-11-11T23:22:20+08:00">2023-11-11</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-11-12 12:35:30" itemprop="dateModified" datetime="2023-11-12T12:35:30+08:00">2023-11-12</time>
-    </span>
-
-  
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2023/11/11/diagram_redis_protocol/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2023/11/11/diagram_redis_protocol/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>注：这是2018年2月写的旧博文，转载到此。</p>
-</blockquote>
-<h1 id="Redis-协议"><a href="#Redis-协议" class="headerlink" title="Redis 协议"></a>Redis 协议</h1><p>Redis客户端和服务端之间使用一种名为RESP(REdis Serialization Protocol)的二进制安全文本协议进行通信。RESP设计的十分精巧，下面是一张完备的协议描述图：<br><img src="/../images/redis_protocol_diagram.png" alt="redis protocol"></p>
-<p>#举个栗子<br>用SET命令来举例说明RESP协议的格式。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; SET mykey &quot;Hello&quot;</span><br><span class="line">&quot;OK&quot;</span><br></pre></td></tr></table></figure>
-<p>实际发送的请求数据：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*3\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$5\r\nHello\r\n</span><br></pre></td></tr></table></figure>
-<p>实际收到的响应数据：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">+OK\r\n</span><br></pre></td></tr></table></figure>
-<p>每种命令对应的回复类型，可以查询Redis官网的命令列表<a target="_blank" rel="noopener" href="https://redis.io/commands">Command reference</a>。更详细的协议说明请参考Redis官方协议规范<a target="_blank" rel="noopener" href="https://redis.io/topics/protocol">Redis Protocol specification</a>。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>[1] 通信协议(protocol)，<a target="_blank" rel="noopener" href="http://redisdoc.com/topic/protocol.html">http://redisdoc.com/topic/protocol.html</a></p>
-<p>[2] Redis Protocol specification，<a target="_blank" rel="noopener" href="https://redis.io/topics/protocol">https://redis.io/topics/protocol</a></p>
-<p>版权声明：自由转载-非商用-非衍生-保持署名（<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh-hans">创意共享4.0许可证</a>）</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://yeyuzhen.github.io/2023/11/11/extremely_simple_anki_deck_struction/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Eason Ye">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Eason's Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Eason's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2023/11/11/extremely_simple_anki_deck_struction/" class="post-title-link" itemprop="url">极简 Anki 牌组结构</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2023-11-11 22:18:16" itemprop="dateCreated datePublished" datetime="2023-11-11T22:18:16+08:00">2023-11-11</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-11-12 12:35:30" itemprop="dateModified" datetime="2023-11-12T12:35:30+08:00">2023-11-12</time>
-    </span>
-
-  
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2023/11/11/extremely_simple_anki_deck_struction/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2023/11/11/extremely_simple_anki_deck_struction/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>注：这是2020年1月写的旧博文，转载到此。</p>
-</blockquote>
-<h1 id="Anki是什么？"><a href="#Anki是什么？" class="headerlink" title="Anki是什么？"></a>Anki是什么？</h1><p>本文假定你是个Anki用户，并不会对Anki基础知识进行介绍。对Anki不熟悉的读者可以阅读Anki英文官网（<a target="_blank" rel="noopener" href="https://apps.ankiweb.net/">Anki - powerful, intelligent flashcards</a>），或Anki中国（<a target="_blank" rel="noopener" href="https://www.ankichina.net/anki20.html">Anki–近乎完美的记忆神器</a>）的介绍内容。</p>
-<h1 id="正确使用牌组"><a href="#正确使用牌组" class="headerlink" title="正确使用牌组"></a>正确使用牌组</h1><p>“正确使用牌组”是<a target="_blank" rel="noopener" href="https://www.ankichina.net/Index/ankishouce">官方 Anki 手册</a>上对 Anki 牌组功能的使用建议，内容如下：</p>
-<blockquote>
-<p>牌组被设计成将你的内容分成你想单独学习的大类，如英语、地理等等。 你可能会想创建许多小的牌组，以保持你的内容有条理，如“我的地理书第1章”，或“食品动词”，但这是不推荐的，有以下原因：</p>
-<ul>
-<li><p>许多小牌组意味着你最终会以可识别的顺序复习卡片。 无论是因为你依次点击每一个牌组（这是缓慢的），或你在一个单一的父级牌组上增加了一些牌组，你最终会看到所有的“第1章”或“食物动词”卡片在一起。 这使得回答卡片更容易，因为你可以从上下文猜测他们，从而导致较弱的记忆。 当你需要回忆单词或Anki外的短语时，你不会有充足的可被证明的相关内容。</p>
-</li>
-<li><p>Anki不是设计来处理许多牌组（超过几十个），它会慢下来，当你添加更多的–尤其是如果你在一个移动客户端的情况下。一些额外的牌组不会产生明显的差异，但是如果你有许多牌组，延误将开始增加。</p>
-</li>
-</ul>
-<p><strong>使用标签和&#x2F;或字段来分类内容，替代创建许多小的牌组，这是一个更好的主意。</strong> 例如替代创建一个“食物动词”，你可以把这些卡片添加到你的主要语言学习牌组，并用“食物”和“动词”来标记卡片。每个卡片可以有多个标签，这意味着你可以做的事情，如寻找所有的动词，或所有与食品有关的词汇，或所有的动词与食品有关。</p>
-<p>对于那些喜欢保持非常有条理的，您可以添加字段到您的笔记分类的内容，如“书”，“页”等。 Anki支持特定字段的搜索，这意味着你可以做一个“图书搜索：‘我的书’页码：63”马上找到你要找的。</p>
-<p>Anki的定制学习和筛选牌组特点使其特别强大，因为你可以从搜索条件创建临时牌组。这允许您在大多数时间（最佳内存）中将内容混合在一个单独的牌组上，同时也需要在特定的材料上创建临时牌组，例如在测试之前。<strong>一般的规则是，如果你总是希望能够单独学习一些内容，它应该是在一个正常的牌组上，如果你只是偶尔需要能够单独学习（测试，有压力时，等），标签&#x2F;字段和过滤牌组更好。</strong></p>
-</blockquote>
-<p>由上可知，官方的建议是不要创建许多小分类牌组，使用几个单独学习的大类牌组即可。强迫症患者可以使用标签或字段来细分类内容，替代创建许多小分类牌组。</p>
-<h1 id="极简牌组结构"><a href="#极简牌组结构" class="headerlink" title="极简牌组结构"></a>极简牌组结构</h1><p><img src="/../images/extermely_simple_anki_struct.png" alt="极简Anki牌组结构"></p>
-<table>
-<thead>
-<tr>
-<th>牌组名称</th>
-<th>用途</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>00-全部</td>
-<td>存放“有效”卡片</td>
-</tr>
-<tr>
-<td>01-迭代</td>
-<td>存放“待修改”卡片</td>
-</tr>
-<tr>
-<td>99-归档</td>
-<td>存放“废弃”卡片</td>
-</tr>
-</tbody></table>
-<ul>
-<li>有效：需要学习&#x2F;复习&#x2F;记忆的卡片；</li>
-<li>待修改：内容不好影响记忆效果，需要修改的卡片；</li>
-<li>废弃：内容过时，已经不需要记忆的卡片；</li>
-</ul>
-<h2 id="“00-全部”牌组"><a href="#“00-全部”牌组" class="headerlink" title="“00-全部”牌组"></a>“00-全部”牌组</h2><p>Anki 中的“有效”卡片最终都是要内化到大脑记忆的，那么卡片也就不需要分类了。用易于记忆的方式组织好卡片的内容，记忆到大脑中后，大脑这台高端分类机器会自动分类的。<br><strong>过度分类最大的弊端是破坏了“间隔重复算法”的有效性。</strong> 因为不同类别的卡片记忆难度是不同的，人为分类之后，你会常常在不经意间选择记忆轻松简单的牌组，而不是靠“间隔重复算法”自动为你选择当前最需要复习的卡片。<br>所以，要记忆的“有效”卡片请全都放到“00-全部”牌组。<strong>如果控制不住自己要进行分类，那么问自己“分类通常是为了区分重要程度，既然有不太重要的卡片，直接归档&#x2F;删除即可，何必要分类？”</strong></p>
-<h2 id="“01-迭代”牌组"><a href="#“01-迭代”牌组" class="headerlink" title="“01-迭代”牌组"></a>“01-迭代”牌组</h2><p>Anki 卡片内容组织方式是使用 Anki 的难点，卡片内容无法一步到位，通常需要多次的迭代修改。如果多次复习某张卡片时都难以回想起来，那么主要有两种可能的原因：</p>
-<ol>
-<li>没有理解卡片对应的知识，靠死记硬背；</li>
-<li>卡片的内容组织方式不当，大脑难以记忆。</li>
-</ol>
-<p>解决第 1 点问题的方式因人而异，毕竟 Anki 只是记忆工具。如何系统的学习和理解新知识超出了 Anki 的范畴，这方面大家可以求助于讲解学习方法的相关书籍。</p>
-<p>第 2 点问题。目前我还没找到“间隔重复”学习理论的专著，只有知乎上的 Anki 爱好者们和 SuperMemo 的博客有一些零星的文章。<strong>卡片内容组织方面，推荐阅读 SuperMemo 的一篇博文《有效学习：组织知识的20条原则》</strong>[<a target="_blank" rel="noopener" href="https://www.supermemo.com/en/archives1990-2015/articles/20rules">英文</a>][<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/163462164a5b">中文</a>]。文章表达的核心观点就是卡片不能把一大堆内容堆砌在卡片中，期望通过间隔重复的方式来记忆，这样是行不通的。卡片的内容要遵循“最小信息原则”，一张卡片只记忆一个极其简单的知识点。</p>
-<p>按我的理解，不管是用问答的形式还是填空形式，<strong>一张卡片最好在 5s 内能快速回想出答案，快速、高频、精准的刺激对应的脑回路，才能形成长期记忆。</strong> 问题和答案没啥强关联，想半天想不出答案，或者答案是好几百字的一大段文字等，都是无法记忆的不合格卡片，需要转移到“01-迭代”牌组进行优化拆分后，再回到“00-全部”牌组进行记忆。</p>
-<h2 id="“99-归档”牌组"><a href="#“99-归档”牌组" class="headerlink" title="“99-归档”牌组"></a>“99-归档”牌组</h2><p>做卡片不易，要耗费很多时间精力，有时候看到过时无用的卡片不舍得删，所以存在这个牌组。由于存放在这个牌组的卡片都是“废弃”的卡片，所以牌组学习新卡片和复习卡片的数量都设置为“0”，以免出现数字提醒干扰。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Anki 虽好，可不要瞎折腾。花太多时间在牌组的结构上就属于没有意义的瞎折腾，钻研卡片的内容组织方式才是对使用 Anki 真正有意义的事情^_^。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>[1] Anki 2.0 用户手册，<a target="_blank" rel="noopener" href="https://www.ankichina.net/Index/ankishouce">https://www.ankichina.net/Index/ankishouce</a><br>[2] 有效学习——组织知识的20个原则，<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/163462164a5b">https://www.jianshu.com/p/163462164a5b</a></p>
-<p>版权声明：自由转载-非商用-非衍生-保持署名（<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh-hans">创意共享4.0许可证</a>）</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://yeyuzhen.github.io/2023/10/15/how_long_english_fluently/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Eason Ye">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Eason's Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Eason's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2023/10/15/how_long_english_fluently/" class="post-title-link" itemprop="url">How long does an adault speak english fluently by english learning applications ?</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2023-10-15 11:26:25" itemprop="dateCreated datePublished" datetime="2023-10-15T11:26:25+08:00">2023-10-15</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-11-12 12:35:30" itemprop="dateModified" datetime="2023-11-12T12:35:30+08:00">2023-11-12</time>
-    </span>
-
-  
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2023/10/15/how_long_english_fluently/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2023/10/15/how_long_english_fluently/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>I used to learn english by Duolingo.</p>
-<p><img src="/../images/duolingo_screenshot.jpg" alt="Duolingo App"></p>
-<p>But Duolingo only has a little speak pratice, so i always try to find an better english speaking app.</p>
-<p>At last year, ChatGPT became more and more popular. I thought may be some english learning applications could used the chatgpt’s AI feature to make a AI tutor. I searched by google, then i found the application “Speak”.It’s amazing app! I can speak to AI tutor, just like a real person. </p>
-<p><img src="/../images/speak_screenshot.jpg" alt="Speak App"></p>
-<p>I think it may be helping me to speak english fluently in six months.</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://yeyuzhen.github.io/2023/06/11/A%20guide%20to%20own%20a%20long-term%20chatgpt%20account%20in%20chinese%20mainland/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Eason Ye">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Eason's Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Eason's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2023/06/11/A%20guide%20to%20own%20a%20long-term%20chatgpt%20account%20in%20chinese%20mainland/" class="post-title-link" itemprop="url">A guide to own a long-term chatgpt account in chinese mainland</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2023-06-11 23:07:00" itemprop="dateCreated datePublished" datetime="2023-06-11T23:07:00+08:00">2023-06-11</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-11-12 12:35:30" itemprop="dateModified" datetime="2023-11-12T12:35:30+08:00">2023-11-12</time>
-    </span>
-
-  
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2023/06/11/A%20guide%20to%20own%20a%20long-term%20chatgpt%20account%20in%20chinese%20mainland/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2023/06/11/A guide to own a long-term chatgpt account in chinese mainland/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="Buy-an-overseas-mobile-phone-physical-card"><a href="#Buy-an-overseas-mobile-phone-physical-card" class="headerlink" title="Buy an overseas mobile phone physical card"></a>Buy an overseas mobile phone physical card</h1><p>Tailand mobile phone card, AIS green card, message card, 10 THB delay validity a month, no voice and network traffic:<br><a target="_blank" rel="noopener" href="https://xunihao.net/product/thailand-ais">https://xunihao.net/product/thailand-ais</a></p>
-<p>Taobao guarantee transaction, buy the “fill price difference(补差价)” product:<br><a target="_blank" rel="noopener" href="https://item.taobao.com/item.htm?ft=t&id=709261038665">https://item.taobao.com/item.htm?ft=t&amp;id=709261038665</a></p>
-<p>Purchase 30 products, comment “Tailand mobile phone card, AIS green card, message card(泰国电话卡AIS绿卡短信卡)” at order form, the shopkeeper will deliver the card to you by expressage.</p>
-<p>When you receive the card, plugin it into your 4G mobile phone, then visit the WeChat public account “Franwell弗兰威尔” to charge the card balance. At least 10 THB each charge to delay validity a month.</p>
-<p>Notice! Delay validity a month because of a charge operate, the AIS  not deduct each month. You can charge 12 times to delay a year.</p>
-<p>About the card number:</p>
-<p>Area code: +66</p>
-<p>Country Name：Tailand</p>
-<p>If number is 0998877666 (total 10 digit)</p>
-<p>When you register any service account, select the country code +66, input the phone number 998877666 (ignore the first digit 0)</p>
-<h1 id="Register-an-overseas-email-account"><a href="#Register-an-overseas-email-account" class="headerlink" title="Register an overseas email account"></a>Register an overseas email account</h1><p>Visit Proton(<a target="_blank" rel="noopener" href="https://proton.me/">https://proton.me/</a>), register an email account. Becase of Proton forbit the AIS phone number to verify account, you have to use your other email to verify it.</p>
-<h1 id="Register-a-chatgpt-account"><a href="#Register-a-chatgpt-account" class="headerlink" title="Register a chatgpt account"></a>Register a chatgpt account</h1><p>Some tips to increase the odds of success:</p>
-<ol>
-<li>Open web browser’s privacy model, avoid to be recognized that you are in chinese mainland.</li>
-<li>Proxy over the GFW to northern european countries, avoid to be restrict registion by Southeast Asia,HongKong,Macow’s IP address.</li>
-<li>Don’t use chinese email, recommend to use Proton email.</li>
-</ol>
-<h1 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h1><ul>
-<li><a target="_blank" rel="noopener" href="https://m.youtube.com/watch?v=NWJeRBMpsx8">【2023最新】在国内也可以轻松注册 ChatGPT 和 OpenAI</a></li>
-<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/374452580?utm_id=0">泰国Ais（绿卡）&#x2F;TrueMove（红卡）说明书</a></li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://yeyuzhen.github.io/2023/02/05/%E6%88%91%E7%9A%84%E6%96%B0%E5%8D%9A%E5%AE%A2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Eason Ye">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Eason's Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Eason's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2023/02/05/%E6%88%91%E7%9A%84%E6%96%B0%E5%8D%9A%E5%AE%A2/" class="post-title-link" itemprop="url">我的新博客</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2023-02-05 22:14:37" itemprop="dateCreated datePublished" datetime="2023-02-05T22:14:37+08:00">2023-02-05</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-11-12 12:35:30" itemprop="dateModified" datetime="2023-11-12T12:35:30+08:00">2023-11-12</time>
-    </span>
-
-  
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Disqus：</span>
-    
-    <a title="disqus" href="/2023/02/05/%E6%88%91%E7%9A%84%E6%96%B0%E5%8D%9A%E5%AE%A2/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2023/02/05/我的新博客/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>阿里云的服务器忘记续费，导致之前用 Flask 搭的博客数据全没了。考虑了一下，还是用 Hexo 在 Github 上搭博客，本地和远端都有 Git 仓库保存全量数据，不容易丢失。虽然需要科学上网才能访问 Github，但是不会科学上网的人似乎也不需要看技术博客，所以网络问题影响也不大。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/11/11/diagram_redis_protocol/" rel="prev" title="图解Redis通信协议">
+                  <i class="fa fa-chevron-left"></i> 图解Redis通信协议
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
     </footer>
   </article>
 </div>
@@ -835,6 +308,12 @@
 
 
 
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
 </div>
   </main>
 
