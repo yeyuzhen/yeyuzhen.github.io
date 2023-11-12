@@ -1,7 +1,7 @@
 ---
 title: A guide to own a long-term chatgpt account in chinese mainland
 date: 2023-06-11 23:07:00
-tags:
+tags: misc
 ---
 
 # Buy an overseas mobile phone physical card

@@ -1,7 +1,7 @@
 ---
 title: 图解Redis通信协议
 date: 2023-11-11 23:22:20
-tags:
+tags: technology
 ---
 
 > 注：这是2018年2月写的旧博文，转载到此。

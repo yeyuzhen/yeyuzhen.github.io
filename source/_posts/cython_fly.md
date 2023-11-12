@@ -1,10 +1,10 @@
 ---
-title: {{ title }}
-date: {{ date }}
-tags:
+title: 用Cython加速Python到“起飞”
+date: 2023-11-12 12:40:03
+tags: technology
 ---
 
-> 注：这是2020年1月写的旧博文，转载到此。
+> 注：这是2018年2月写的旧博文，转载到此。
 
 事先声明，标题没有把“Python”错打成“Cython”，因为要讲的就是名为“Cython”的东西。
 
