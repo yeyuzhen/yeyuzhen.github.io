@@ -125,12 +125,8 @@
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">标签</span>
       </div>
   </nav>
 </div>
@@ -191,7 +187,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-05-05 15:53:31" itemprop="dateModified" datetime="2024-05-05T15:53:31+08:00">2024-05-05</time>
+      <time title="修改时间：2024-05-05 16:13:44" itemprop="dateModified" datetime="2024-05-05T16:13:44+08:00">2024-05-05</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -199,7 +195,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/open-source/" itemprop="url" rel="index"><span itemprop="name">open source</span></a>
+          <a href="/categories/technology/" itemprop="url" rel="index"><span itemprop="name">technology</span></a>
         </span>
     </span>
 
@@ -304,7 +300,16 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-05-05 15:53:31" itemprop="dateModified" datetime="2024-05-05T15:53:31+08:00">2024-05-05</time>
+      <time title="修改时间：2024-05-05 16:13:44" itemprop="dateModified" datetime="2024-05-05T16:13:44+08:00">2024-05-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/technology/" itemprop="url" rel="index"><span itemprop="name">technology</span></a>
+        </span>
     </span>
 
   
@@ -337,78 +342,15 @@
 <p>事先声明，标题没有把“Python”错打成“Cython”，因为要讲的就是名为“Cython”的东西。</p>
 <p><a target="_blank" rel="noopener" href="http://cython.org/">Cython</a>是让Python脚本支持C语言扩展的编译器，Cython能够将Python+C混合编码的.pyx脚本转换为C代码，主要用于优化Python脚本性能或Python调用C函数库。由于Python固有的性能差的问题，用C扩展Python成为提高Python性能常用方法，Cython算是较为常见的一种扩展方式。</p>
 <p>我们可以对比一下业界主流的几种Python扩展支持C语言的方案：<br><img src="/../images/python_support_c.png" alt="有试用版水印，是因为穷T_T"></p>
-<p><a target="_blank" rel="noopener" href="https://docs.python.org/2/library/ctypes.html">ctypes</a>是Python标准库支持的方案，直接在Python脚本中导入C的.so库进行调用，简单直接。<a target="_blank" rel="noopener" href="http://www.swig.org/translations/chinese/index.html">swig</a>是一个通用的让高级脚本语言扩展支持C的工具，自然也是支持Python的。ctypes没玩过，不做评价。以c语言程序性能为基准的话，cython封装后下降20%，swig封装后下降70%。功能方面，swig对结构体和回调函数都要使用typemap进行手工编写转换规则，typemap规则写起来略复杂，体验不是很好。cython在结构体和回调上也要进行手工编码处理，不过比较简单。</p>
-<h1 id="Cython简单实例"><a href="#Cython简单实例" class="headerlink" title="Cython简单实例"></a>Cython简单实例</h1><p>我们尝试用Cython，让Python脚本调用C语言写的打印“Hello World”的函数，来熟悉一下Cython的玩法。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/*filename: hello_world.h */</span><br><span class="line">void print_hello_world();</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">/*filename: hello_world.c */</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &quot;hello_world.h&quot;</span><br><span class="line"></span><br><span class="line">void print_hello_world()</span><br><span class="line">&#123;</span><br><span class="line">    printf(&quot;hello world...&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main(int arch, char *argv[])</span><br><span class="line">&#123;</span><br><span class="line">    print_hello_world();</span><br><span class="line">    return (0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#file: hello_world.pyx</span><br><span class="line"></span><br><span class="line">cdef extern from &quot;hello_world.h&quot;:</span><br><span class="line">    void print_hello_world()</span><br><span class="line"></span><br><span class="line">def cython_print_hello_world():</span><br><span class="line">    print_hello_world()</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">#filename: Makefile</span><br><span class="line">all: hello_world cython_hello_world</span><br><span class="line"></span><br><span class="line">hello_world:</span><br><span class="line">    gcc hello_world.c -c hello_world.c</span><br><span class="line">    gcc hello_world.o -o hello_world </span><br><span class="line"></span><br><span class="line">cython:</span><br><span class="line">    cython cython_hello_world.pyx</span><br><span class="line"></span><br><span class="line">cython_hello_world: cython</span><br><span class="line">    gcc cython_hello_world.c -fPIC -c</span><br><span class="line">    gcc -shared -lpython2.7 -o cython_hello_world.so hello_world.o cython_hello_world.o</span><br><span class="line"></span><br><span class="line">clean:</span><br><span class="line">    rm -rf hello_world hello_world.o cython_hello_world.so cython_hello_world.c cython_hello_world.o</span><br></pre></td></tr></table></figure>
-<p>用Cython扩展C，最重要的就是编写.pyx脚本文件。.pyx脚本是Python调用C的桥梁，.pyx脚本中即能用Python语法写，也可以用类C语法写。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ make all    # 详细的编译过程可以看Makefile中的相关指令</span><br><span class="line">$ python</span><br><span class="line">&gt;&gt;&gt; import cython_hello_world</span><br><span class="line">&gt;&gt;&gt; cython_hello_world.cython_print_hello_world()</span><br><span class="line">hello world...</span><br><span class="line">&gt;&gt;&gt;</span><br></pre></td></tr></table></figure>
-<p>可以看到，我们成功的在Python解释器中调用了C语言实现的函数。</p>
-<h1 id="Cython的注意事项"><a href="#Cython的注意事项" class="headerlink" title="Cython的注意事项"></a>Cython的注意事项</h1><p>所有工具&#x2F;语言的简单使用都是令人愉快的，但是深入细节就会发现处处“暗藏杀机”。最近是项目需要扩展C底层库给Python调用，所以引入了Cython。实践过程中踩了很多坑，熬了很多夜T_T。遇到了以下几点需要特别注意的点：</p>
-<blockquote>
-<ol>
-<li>.pyx中用cdef定义的东西，除类以外对.py都是不可见的；</li>
-</ol>
-</blockquote>
-<blockquote>
-<ol start="2">
-<li>.py中是不能操作C类型的，如果想在.py中操作C类型就要在.pyx中从python object转成C类型或者用含有set&#x2F;get方法的C类型包裹类；</li>
-</ol>
-</blockquote>
-<blockquote>
-<ol start="3">
-<li>虽然Cython能对Python的str和C的“char *”之间进行自动类型转换，但是对于“char a[n]”这种固定长度的字符串是无法自动转换的。需要使用Cython的libc.string.strcpy进行显式拷贝；</li>
-</ol>
-</blockquote>
-<blockquote>
-<ol start="4">
-<li>回调函数需要用函数包裹，再通过C的“void *”强制转换后才能传入C函数。</li>
-</ol>
-</blockquote>
-<h2 id="1-pyx中用cdef定义的类型，除类以外对-py都不可见"><a href="#1-pyx中用cdef定义的类型，除类以外对-py都不可见" class="headerlink" title="1. .pyx中用cdef定义的类型，除类以外对.py都不可见"></a>1. .pyx中用cdef定义的类型，除类以外对.py都不可见</h2><p>我们来看一个例子：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#file: invisible.pyx</span><br><span class="line">cdef inline cdef_function():</span><br><span class="line">    print(&#x27;cdef_function&#x27;)</span><br><span class="line"></span><br><span class="line">def def_function():</span><br><span class="line">    print(&#x27;def_function&#x27;)</span><br><span class="line"></span><br><span class="line">cdef int cdef_value</span><br><span class="line"></span><br><span class="line">def_value = 999</span><br><span class="line"></span><br><span class="line">cdef class cdef_class:</span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.value = 1</span><br><span class="line"></span><br><span class="line">class def_class:</span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.value = 1</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#file: test_visible.py</span><br><span class="line">import invisible</span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    print(&#x27;invisible.__dict__&#x27;, invisible.__dict__)</span><br></pre></td></tr></table></figure>
-<p>输出的invisible模块的成员如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ python invisible.py</span><br><span class="line">&#123;</span><br><span class="line">&#x27;__builtins__&#x27;: &lt;module &#x27;__builtin__&#x27; (built-in)&gt;, </span><br><span class="line">&#x27;def_class&#x27;: &lt;class invisible.def_class at 0x10feed1f0&gt;, </span><br><span class="line">&#x27;__file__&#x27;: &#x27;/git/EasonCodeShare/cython_tutorials/invisible-for-py/invisible.so&#x27;, </span><br><span class="line">&#x27;call_all_in_pyx&#x27;: &lt;built-in function call_all_in_pyx&gt;, </span><br><span class="line">&#x27;__pyx_unpickle_cdef_class&#x27;: &lt;built-in function __pyx_unpickle_cdef_class&gt;, </span><br><span class="line">&#x27;__package__&#x27;: None, </span><br><span class="line">&#x27;__test__&#x27;: &#123;&#125;, </span><br><span class="line">&#x27;cdef_class&#x27;: &lt;type &#x27;invisible.cdef_class&#x27;&gt;, </span><br><span class="line">&#x27;__name__&#x27;: &#x27;invisible&#x27;, </span><br><span class="line">&#x27;def_value&#x27;: 999, </span><br><span class="line">&#x27;def_function&#x27;: &lt;built-in function def_function&gt;, </span><br><span class="line">&#x27;__doc__&#x27;: None&#125;</span><br></pre></td></tr></table></figure>
-<p>我们在.pyx用cdef定义的函数cdef_function、变量cdef_value都看不到了，只有类cdef_class能可见。所以，使用过程中要注意可见性问题，不要错误的在.py中尝试使用不可见的模块成员。</p>
-<h2 id="2-py传递C结构体类型"><a href="#2-py传递C结构体类型" class="headerlink" title="2. .py传递C结构体类型"></a>2. .py传递C结构体类型</h2><p>Cython扩展C的能力仅限于.pyx脚本中，.py脚本还是只能用纯Python。如果你在C中定义了一个结构，要从Python脚本中传进来就只能在.pyx手工转换一次，或者用包裹类传进来。我们来看一个例子：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/*file: person_info.h */</span><br><span class="line">typedef struct person_info_t</span><br><span class="line">&#123;</span><br><span class="line">    int age;</span><br><span class="line">    char *gender;</span><br><span class="line">&#125;person_info;</span><br><span class="line"></span><br><span class="line">void print_person_info(char *name, person_info *info);</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//file: person_info.c</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &quot;person_info.h&quot;</span><br><span class="line"></span><br><span class="line">void print_person_info(char *name, person_info *info)</span><br><span class="line">&#123;</span><br><span class="line">    printf(&quot;name: %s, age: %d, gender: %s\n&quot;,</span><br><span class="line">            name, info-&gt;age, info-&gt;gender);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">#file: cython_person_info.pyx</span><br><span class="line">cdef extern from &quot;person_info.h&quot;:</span><br><span class="line">    struct person_info_t:</span><br><span class="line">        int age</span><br><span class="line">        char *gender</span><br><span class="line">    ctypedef person_info_t person_info</span><br><span class="line"></span><br><span class="line">    void print_person_info(char *name, person_info *info)</span><br><span class="line"></span><br><span class="line">def cyprint_person_info(name, info):</span><br><span class="line">    cdef person_info pinfo</span><br><span class="line">    pinfo.age = info.age</span><br><span class="line">    pinfo.gender = info.gender</span><br><span class="line">    print_person_info(name, &amp;pinfo)</span><br></pre></td></tr></table></figure>
-<p>因为“cyprint_person_info”的参数只能是python object，所以我们要在函数中手工编码转换一下类型再调用C函数。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#file: test_person_info.py</span><br><span class="line">from cython_person_info import cyprint_person_info</span><br><span class="line"></span><br><span class="line">class person_info(object):</span><br><span class="line">    age = None</span><br><span class="line">    gender = None</span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    info = person_info()</span><br><span class="line">    info.age = 18</span><br><span class="line">    info.gender = &#x27;male&#x27;</span><br><span class="line">    </span><br><span class="line">    cyprint_person_info(&#x27;handsome&#x27;, info)</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ python test_person_info.py</span><br><span class="line">name: handsome, age: 18, gender: male</span><br></pre></td></tr></table></figure>
-<p>能正常调用到C函数。可是，这样存在一个问题，如果我们C的结构体字段很多，我们每次从.py脚本调用C函数都要手工编码转换一次类型数据就会很麻烦。还有更好的一个办法就是给C的结构体提供一个包裹类。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">#file: cython_person_info.pyx</span><br><span class="line">from libc.stdlib cimport malloc, free</span><br><span class="line">cdef extern from &quot;person_info.h&quot;:</span><br><span class="line">    struct person_info_t:</span><br><span class="line">        int age</span><br><span class="line">        char *gender</span><br><span class="line">    ctypedef person_info_t person_info</span><br><span class="line"></span><br><span class="line">    void print_person_info(char *name, person_info *info)</span><br><span class="line"></span><br><span class="line">def cyprint_person_info(name, person_info_wrap info):</span><br><span class="line">    print_person_info(name, info.ptr)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cdef class person_info_wrap(object):</span><br><span class="line">    cdef person_info *ptr</span><br><span class="line">    </span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.ptr = &lt;person_info *&gt;malloc(sizeof(person_info))</span><br><span class="line">    </span><br><span class="line">    def __del__(self):</span><br><span class="line">        free(self.ptr)</span><br><span class="line">    </span><br><span class="line">    @property</span><br><span class="line">    def age(self):</span><br><span class="line">        return self.ptr.age</span><br><span class="line">    @age.setter</span><br><span class="line">    def age(self, value):</span><br><span class="line">        self.ptr.age = value</span><br><span class="line">    </span><br><span class="line">    @property</span><br><span class="line">    def gender(self):</span><br><span class="line">        return self.ptr.gender</span><br><span class="line">    @gender.setter</span><br><span class="line">    def gender(self, value):</span><br><span class="line">        self.ptr.gender = value</span><br></pre></td></tr></table></figure>
-<p>我们定义了一个“person_info”结构体的包裹类“person_info_wrap”，并提供了成员set&#x2F;get方法，这样就可以在.py中直接赋值了。减少了在.pyx中转换数据类型的步骤，能有效的提高性能。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#file: test_person_info.py</span><br><span class="line">from cython_person_info import cyprint_person_info, person_info_wrap</span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    info_wrap = person_info_wrap()</span><br><span class="line">    info_wrap.age = 88</span><br><span class="line">    info_wrap.gender = &#x27;mmmale&#x27;</span><br><span class="line">    </span><br><span class="line">    cyprint_person_info(&#x27;hhhandsome&#x27;, info_wrap)</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ python test_person_info.py </span><br><span class="line">name: hhhandsome, age: 88, gender: mmmale</span><br></pre></td></tr></table></figure>
-
-<h2 id="3-python的str传递给C固定长度字符串要用strcpy"><a href="#3-python的str传递给C固定长度字符串要用strcpy" class="headerlink" title="3. python的str传递给C固定长度字符串要用strcpy"></a>3. python的str传递给C固定长度字符串要用strcpy</h2><p>正如在C语言中，字符串之间不能直接赋值拷贝，而要使用strcpy复制一样，python的str和C字符串之间也要用cython封装的libc.string.strcpy函数来拷贝。我们稍微修改上一个例子，让person_info结构体的gender成员为16字节长的字符串：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/*file: person_info.h */</span><br><span class="line">typedef struct person_info_t</span><br><span class="line">&#123;</span><br><span class="line">    int age;</span><br><span class="line">    char gender[16];</span><br><span class="line">&#125;person_info;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#file: cython_person_info.pyx</span><br><span class="line">cdef extern from &quot;person_info.h&quot;:</span><br><span class="line">    struct person_info_t:</span><br><span class="line">        int age</span><br><span class="line">        char gender[16]</span><br><span class="line">    ctypedef person_info_t person_info</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#file: test_person_info.py</span><br><span class="line">from cython_person_info import cyprint_person_info, person_info_wrap</span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    info_wrap = person_info_wrap()</span><br><span class="line">    info_wrap.age = 88</span><br><span class="line">    info_wrap.gender = &#x27;mmmale&#x27;</span><br><span class="line">    </span><br><span class="line">    cyprint_person_info(&#x27;hhhandsome&#x27;, info_wrap)</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ make</span><br><span class="line">$ python test_person_info.py </span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File &quot;test_person_info.py&quot;, line 7, in &lt;module&gt;</span><br><span class="line">    info_wrap.gender = &#x27;mmmale&#x27;</span><br><span class="line">  File &quot;cython_person_info.pyx&quot;, line 39, in cython_person_info.person_info_wrap.gender.__set__</span><br><span class="line">    self.ptr.gender = value</span><br><span class="line">  File &quot;stringsource&quot;, line 93, in carray.from_py.__Pyx_carray_from_py_char</span><br><span class="line">IndexError: not enough values found during array assignment, expected 16, got 6</span><br></pre></td></tr></table></figure>
-<p>cython转换和make时候是没有报错的，运行的时候提示“IndexError: not enough values found during array assignment, expected 16, got 6”，其实就是6字节长的“mmmale”赋值给了person_info结构体的“char gender[16]”成员。我们用strcpy来实现字符串之间的拷贝就ok了。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#file: cython_person_info.pyx</span><br><span class="line">from libc.string cimport strcpy</span><br><span class="line">…… ……</span><br><span class="line">cdef class person_info_wrap(object):</span><br><span class="line">    cdef person_info *ptr</span><br><span class="line">    …… ……</span><br><span class="line">    @property</span><br><span class="line">    def gender(self):</span><br><span class="line">        return self.ptr.gender</span><br><span class="line">    @gender.setter</span><br><span class="line">    def gender(self, value):</span><br><span class="line">        strcpy(self.ptr.gender, value)</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ make</span><br><span class="line">$ python test_person_info.py </span><br><span class="line">name: hhhandsome, age: 88, gender: mmmale</span><br></pre></td></tr></table></figure>
-<p>赋值拷贝正常，成功将“mmmale”拷贝给了结构体的gender成员。</p>
-<h2 id="4-用回调函数作为参数的C函数封装"><a href="#4-用回调函数作为参数的C函数封装" class="headerlink" title="4. 用回调函数作为参数的C函数封装"></a>4. 用回调函数作为参数的C函数封装</h2><p>C中的回调函数比较特殊，用户传入回调函数来定制化的处理数据。Cython官方提供了封装带有回调函数参数的<a target="_blank" rel="noopener" href="https://github.com/cython/cython/tree/master/Demos/callback">例子</a>：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">//file: cheesefinder.h</span><br><span class="line">typedef void (*cheesefunc)(char *name, void *user_data);</span><br><span class="line">void find_cheeses(cheesefunc user_func, void *user_data);</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">//file: cheesefinder.c</span><br><span class="line">#include &quot;cheesefinder.h&quot;</span><br><span class="line"></span><br><span class="line">static char *cheeses[] = &#123;</span><br><span class="line">  &quot;cheddar&quot;,</span><br><span class="line">  &quot;camembert&quot;,</span><br><span class="line">  &quot;that runny one&quot;,</span><br><span class="line">  0</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">void find_cheeses(cheesefunc user_func, void *user_data) &#123;</span><br><span class="line">  char **p = cheeses;</span><br><span class="line">  while (*p) &#123;</span><br><span class="line">    user_func(*p, user_data);</span><br><span class="line">    ++p;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#file: cheese.pyx</span><br><span class="line">cdef extern from &quot;cheesefinder.h&quot;:</span><br><span class="line">    ctypedef void (*cheesefunc)(char *name, void *user_data)</span><br><span class="line">    void find_cheeses(cheesefunc user_func, void *user_data)</span><br><span class="line"></span><br><span class="line">def find(f):</span><br><span class="line">    find_cheeses(callback, &lt;void*&gt;f)</span><br><span class="line"></span><br><span class="line">cdef void callback(char *name, void *f):</span><br><span class="line">    (&lt;object&gt;f)(name.decode(&#x27;utf-8&#x27;))</span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">import cheese</span><br><span class="line"></span><br><span class="line">def report_cheese(name):</span><br><span class="line">    print(&quot;Found cheese: &quot; + name)</span><br><span class="line"></span><br><span class="line">cheese.find(report_cheese)</span><br></pre></td></tr></table></figure>
-<p>关键的步骤就是在.pyx中定义一个和C的回调函数相同的回调包裹函数，如上的“cdef void callback(char *name, void *f)”。之后，将.py中的函数作为参数传递给包裹函数，并在包裹函数中转换成函数对象进行调用。</p>
-<h1 id="扩展阅读"><a href="#扩展阅读" class="headerlink" title="扩展阅读"></a>扩展阅读</h1><p>更进一步的研究Cython可以参考官方文档和相关书籍：</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="http://cython.readthedocs.io/en/latest/index.html#">Cython 0.28a0 documentation</a></li>
-<li><a target="_blank" rel="noopener" href="https://www.amazon.com/Cython-Programmers-Kurt-W-Smith/dp/1491901551">Cython A Guide for Python Programmers</a></li>
-<li><a target="_blank" rel="noopener" href="https://www.amazon.com/Learning-Cython-Programming-Philip-Herron/dp/1783280794">Learning Cython Programming</a></li>
-</ul>
-<p>版权声明：自由转载-非商用-非衍生-保持署名（<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh-hans">创意共享4.0许可证</a>）</p>
-
+<p><a target="_blank" rel="noopener" href="https://docs.python.org/2/library/ctypes.html">ctypes</a>是Python标准库支持的方案，直接在Python脚本中导入C的.so库进行调用，简单直接。<a target="_blank" rel="noopener" href="http://www.swig.org/translations/chinese/index.html">swig</a>是一个通用的让高级脚本语言扩展支持C的工具，自然也是支持Python的。ctypes没玩过，不做评价。以c语言程序性能为基准的话，cython封装后下降20%，swig封装后下降70%。功能方面，swig对结构体和回调函数都要使用typemap进行手工编写转换规则，typemap规则写起来略复杂，体验不是很好。cython在结构体和回调上也要进行手工编码处理，不过比较简单。
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/11/12/cython_fly/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -470,7 +412,16 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-05-05 15:53:31" itemprop="dateModified" datetime="2024-05-05T15:53:31+08:00">2024-05-05</time>
+      <time title="修改时间：2024-05-05 16:13:44" itemprop="dateModified" datetime="2024-05-05T16:13:44+08:00">2024-05-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/technology/" itemprop="url" rel="index"><span itemprop="name">technology</span></a>
+        </span>
     </span>
 
   
@@ -573,7 +524,16 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-05-05 15:53:31" itemprop="dateModified" datetime="2024-05-05T15:53:31+08:00">2024-05-05</time>
+      <time title="修改时间：2024-05-05 16:13:44" itemprop="dateModified" datetime="2024-05-05T16:13:44+08:00">2024-05-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study/" itemprop="url" rel="index"><span itemprop="name">study</span></a>
+        </span>
     </span>
 
   
@@ -619,45 +579,14 @@
 </blockquote>
 <p>由上可知，官方的建议是不要创建许多小分类牌组，使用几个单独学习的大类牌组即可。强迫症患者可以使用标签或字段来细分类内容，替代创建许多小分类牌组。</p>
 <h1 id="极简牌组结构"><a href="#极简牌组结构" class="headerlink" title="极简牌组结构"></a>极简牌组结构</h1><p><img src="/../images/extermely_simple_anki_struct.png" alt="极简Anki牌组结构"></p>
-<table>
-<thead>
-<tr>
-<th>牌组名称</th>
-<th>用途</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>00-全部</td>
-<td>存放“有效”卡片</td>
-</tr>
-<tr>
-<td>01-迭代</td>
-<td>存放“待修改”卡片</td>
-</tr>
-<tr>
-<td>99-归档</td>
-<td>存放“废弃”卡片</td>
-</tr>
-</tbody></table>
-<ul>
-<li>有效：需要学习&#x2F;复习&#x2F;记忆的卡片；</li>
-<li>待修改：内容不好影响记忆效果，需要修改的卡片；</li>
-<li>废弃：内容过时，已经不需要记忆的卡片；</li>
-</ul>
-<h2 id="“00-全部”牌组"><a href="#“00-全部”牌组" class="headerlink" title="“00-全部”牌组"></a>“00-全部”牌组</h2><p>Anki 中的“有效”卡片最终都是要内化到大脑记忆的，那么卡片也就不需要分类了。用易于记忆的方式组织好卡片的内容，记忆到大脑中后，大脑这台高端分类机器会自动分类的。<br><strong>过度分类最大的弊端是破坏了“间隔重复算法”的有效性。</strong> 因为不同类别的卡片记忆难度是不同的，人为分类之后，你会常常在不经意间选择记忆轻松简单的牌组，而不是靠“间隔重复算法”自动为你选择当前最需要复习的卡片。<br>所以，要记忆的“有效”卡片请全都放到“00-全部”牌组。<strong>如果控制不住自己要进行分类，那么问自己“分类通常是为了区分重要程度，既然有不太重要的卡片，直接归档&#x2F;删除即可，何必要分类？”</strong></p>
-<h2 id="“01-迭代”牌组"><a href="#“01-迭代”牌组" class="headerlink" title="“01-迭代”牌组"></a>“01-迭代”牌组</h2><p>Anki 卡片内容组织方式是使用 Anki 的难点，卡片内容无法一步到位，通常需要多次的迭代修改。如果多次复习某张卡片时都难以回想起来，那么主要有两种可能的原因：</p>
-<ol>
-<li>没有理解卡片对应的知识，靠死记硬背；</li>
-<li>卡片的内容组织方式不当，大脑难以记忆。</li>
-</ol>
-<p>解决第 1 点问题的方式因人而异，毕竟 Anki 只是记忆工具。如何系统的学习和理解新知识超出了 Anki 的范畴，这方面大家可以求助于讲解学习方法的相关书籍。</p>
-<p>第 2 点问题。目前我还没找到“间隔重复”学习理论的专著，只有知乎上的 Anki 爱好者们和 SuperMemo 的博客有一些零星的文章。<strong>卡片内容组织方面，推荐阅读 SuperMemo 的一篇博文《有效学习：组织知识的20条原则》</strong>[<a target="_blank" rel="noopener" href="https://www.supermemo.com/en/archives1990-2015/articles/20rules">英文</a>][<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/163462164a5b">中文</a>]。文章表达的核心观点就是卡片不能把一大堆内容堆砌在卡片中，期望通过间隔重复的方式来记忆，这样是行不通的。卡片的内容要遵循“最小信息原则”，一张卡片只记忆一个极其简单的知识点。</p>
-<p>按我的理解，不管是用问答的形式还是填空形式，<strong>一张卡片最好在 5s 内能快速回想出答案，快速、高频、精准的刺激对应的脑回路，才能形成长期记忆。</strong> 问题和答案没啥强关联，想半天想不出答案，或者答案是好几百字的一大段文字等，都是无法记忆的不合格卡片，需要转移到“01-迭代”牌组进行优化拆分后，再回到“00-全部”牌组进行记忆。</p>
-<h2 id="“99-归档”牌组"><a href="#“99-归档”牌组" class="headerlink" title="“99-归档”牌组"></a>“99-归档”牌组</h2><p>做卡片不易，要耗费很多时间精力，有时候看到过时无用的卡片不舍得删，所以存在这个牌组。由于存放在这个牌组的卡片都是“废弃”的卡片，所以牌组学习新卡片和复习卡片的数量都设置为“0”，以免出现数字提醒干扰。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Anki 虽好，可不要瞎折腾。花太多时间在牌组的结构上就属于没有意义的瞎折腾，钻研卡片的内容组织方式才是对使用 Anki 真正有意义的事情^_^。</p>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>[1] Anki 2.0 用户手册，<a target="_blank" rel="noopener" href="https://www.ankichina.net/Index/ankishouce">https://www.ankichina.net/Index/ankishouce</a><br>[2] 有效学习——组织知识的20个原则，<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/163462164a5b">https://www.jianshu.com/p/163462164a5b</a></p>
-<p>版权声明：自由转载-非商用-非衍生-保持署名（<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh-hans">创意共享4.0许可证</a>）</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/11/11/extremely_simple_anki_deck_struction/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -719,7 +648,16 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-05-05 15:53:31" itemprop="dateModified" datetime="2024-05-05T15:53:31+08:00">2024-05-05</time>
+      <time title="修改时间：2024-05-05 16:13:44" itemprop="dateModified" datetime="2024-05-05T16:13:44+08:00">2024-05-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/study/" itemprop="url" rel="index"><span itemprop="name">study</span></a>
+        </span>
     </span>
 
   
@@ -746,13 +684,15 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>I used to learn english by Duolingo.</p>
-<p><img src="/../images/duolingo_screenshot.jpg" alt="Duolingo App"></p>
-<p>But Duolingo only has a little speak pratice, so i always try to find an better english speaking app.</p>
-<p>At last year, ChatGPT became more and more popular. I thought may be some english learning applications could used the chatgpt’s AI feature to make a AI tutor. I searched by google, then i found the application “Speak”.It’s amazing app! I can speak to AI tutor, just like a real person. </p>
-<p><img src="/../images/speak_screenshot.jpg" alt="Speak App"></p>
-<p>I think it may be helping me to speak english fluently in six months.</p>
-
+          <p>I used to learn english by Duolingo.
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/10/15/how_long_english_fluently/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -814,7 +754,16 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-05-05 15:53:31" itemprop="dateModified" datetime="2024-05-05T15:53:31+08:00">2024-05-05</time>
+      <time title="修改时间：2024-05-05 16:13:44" itemprop="dateModified" datetime="2024-05-05T16:13:44+08:00">2024-05-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/misc/" itemprop="url" rel="index"><span itemprop="name">misc</span></a>
+        </span>
     </span>
 
   
@@ -845,24 +794,15 @@
 <p>Taobao guarantee transaction, buy the “fill price difference(补差价)” product:<br><a target="_blank" rel="noopener" href="https://item.taobao.com/item.htm?ft=t&id=709261038665">https://item.taobao.com/item.htm?ft=t&amp;id=709261038665</a></p>
 <p>Purchase 30 products, comment “Tailand mobile phone card, AIS green card, message card(泰国电话卡AIS绿卡短信卡)” at order form, the shopkeeper will deliver the card to you by expressage.</p>
 <p>When you receive the card, plugin it into your 4G mobile phone, then visit the WeChat public account “Franwell弗兰威尔” to charge the card balance. At least 10 THB each charge to delay validity a month.</p>
-<p>Notice! Delay validity a month because of a charge operate, the AIS  not deduct each month. You can charge 12 times to delay a year.</p>
-<p>About the card number:</p>
-<p>Area code: +66</p>
-<p>Country Name：Tailand</p>
-<p>If number is 0998877666 (total 10 digit)</p>
-<p>When you register any service account, select the country code +66, input the phone number 998877666 (ignore the first digit 0)</p>
-<h1 id="Register-an-overseas-email-account"><a href="#Register-an-overseas-email-account" class="headerlink" title="Register an overseas email account"></a>Register an overseas email account</h1><p>Visit Proton(<a target="_blank" rel="noopener" href="https://proton.me/">https://proton.me/</a>), register an email account. Becase of Proton forbit the AIS phone number to verify account, you have to use your other email to verify it.</p>
-<h1 id="Register-a-chatgpt-account"><a href="#Register-a-chatgpt-account" class="headerlink" title="Register a chatgpt account"></a>Register a chatgpt account</h1><p>Some tips to increase the odds of success:</p>
-<ol>
-<li>Open web browser’s privacy model, avoid to be recognized that you are in chinese mainland.</li>
-<li>Proxy over the GFW to northern european countries, avoid to be restrict registion by Southeast Asia,HongKong,Macow’s IP address.</li>
-<li>Don’t use chinese email, recommend to use Proton email.</li>
-</ol>
-<h1 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h1><ul>
-<li><a target="_blank" rel="noopener" href="https://m.youtube.com/watch?v=NWJeRBMpsx8">【2023最新】在国内也可以轻松注册 ChatGPT 和 OpenAI</a></li>
-<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/374452580?utm_id=0">泰国Ais（绿卡）&#x2F;TrueMove（红卡）说明书</a></li>
-</ul>
-
+<p>Notice! Delay validity a month because of a charge operate, the AIS  not deduct each month. You can charge 12 times to delay a year.
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/06/11/A%20guide%20to%20own%20a%20long-term%20chatgpt%20account%20in%20chinese%20mainland/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -924,7 +864,16 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-05-05 15:53:31" itemprop="dateModified" datetime="2024-05-05T15:53:31+08:00">2024-05-05</time>
+      <time title="修改时间：2024-05-05 16:13:44" itemprop="dateModified" datetime="2024-05-05T16:13:44+08:00">2024-05-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/misc/" itemprop="url" rel="index"><span itemprop="name">misc</span></a>
+        </span>
     </span>
 
   
