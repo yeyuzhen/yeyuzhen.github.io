@@ -14,6 +14,8 @@ Redis使用了一个称为“A simple event-driven programming library”的自�
 
 redis的src目录下，ae开头的几个文件就是AE事件库的源码。
 
+<!-- more -->
+
 | 文件 | 用途 | 
 |- | - |
 |ae.h| AE事件库接口定义 |

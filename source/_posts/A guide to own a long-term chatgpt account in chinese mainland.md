@@ -11,6 +11,8 @@ https://xunihao.net/product/thailand-ais
 Taobao guarantee transaction, buy the "fill price difference(补差价)" product:
 https://item.taobao.com/item.htm?ft=t&id=709261038665
 
+<!-- more -->
+
 Purchase 30 products, comment "Tailand mobile phone card, AIS green card, message card(泰国电话卡AIS绿卡短信卡)" at order form, the shopkeeper will deliver the card to you by expressage.
 
 When you receive the card, plugin it into your 4G mobile phone, then visit the WeChat public account "Franwell弗兰威尔" to charge the card balance. At least 10 THB each charge to delay validity a month.
